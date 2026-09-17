@@ -8,7 +8,9 @@ const BDW_SETWINDOWPOS = 1;
 const BDW_SETWINDOWTEXT = 2;
 const BDW_FORCECHILDREFRESH = 3;
 
-class SWPParam extends Struct {
+HWND hwndFromHandle(int handle) => HWND(Pointer.fromAddress(handle));
+
+base class SWPParam extends Struct {
   @Int32()
   external int x, y, cx, cy, uFlags;
 }
@@ -22,19 +24,22 @@ void setWindowPos(
     ..cx = cx
     ..cy = cy
     ..uFlags = uFlags;
-  PostMessage(hWnd, WM_BDW_ACTION, BDW_SETWINDOWPOS, param.address);
+  PostMessage(hwndFromHandle(hWnd), WM_BDW_ACTION,
+      const WPARAM(BDW_SETWINDOWPOS), LPARAM(param.address));
 }
 
-class SWTParam extends Struct {
+base class SWTParam extends Struct {
   external Pointer<Utf16> text;
 }
 
 void setWindowText(int hWnd, String text) {
   final param = calloc<SWTParam>();
   param.ref.text = text.toNativeUtf16();
-  PostMessage(hWnd, WM_BDW_ACTION, BDW_SETWINDOWTEXT, param.address);
+  PostMessage(hwndFromHandle(hWnd), WM_BDW_ACTION,
+      const WPARAM(BDW_SETWINDOWTEXT), LPARAM(param.address));
 }
 
 void forceChildRefresh(int hWnd) {
-  PostMessage(hWnd, WM_BDW_ACTION, BDW_FORCECHILDREFRESH, 0);
+  PostMessage(hwndFromHandle(hWnd), WM_BDW_ACTION,
+      const WPARAM(BDW_FORCECHILDREFRESH), const LPARAM(0));
 }
